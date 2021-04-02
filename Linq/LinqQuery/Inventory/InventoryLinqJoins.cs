@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Linq.LinqQuery
+namespace Linq.LinqQuery.Inventory
 {
     public class InventoryLinqJoins
     {

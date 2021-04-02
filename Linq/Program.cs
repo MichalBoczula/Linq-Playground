@@ -1,4 +1,4 @@
-﻿using Linq.LinqQuery;
+﻿using Linq.LinqQuery.Inventory;
 using Linq.Models;
 using System;
 using System.Collections.Generic;
@@ -11,8 +11,8 @@ namespace Linq
         static void Main(string[] args)
         {
             var dbcontext = new W3ResourceContext();
-            var inventoryLinqJoins = new InventoryLinqJoins(dbcontext);
-            inventoryLinqJoins.TestWithAggragation();
+            var inventoryLinqJoins = new InventoryLinqSubQueries(dbcontext);
+            inventoryLinqJoins.TwentySeventhExe();
         }
     }
 }

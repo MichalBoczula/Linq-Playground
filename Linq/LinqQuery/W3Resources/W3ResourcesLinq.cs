@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Linq.LinqQuery
+namespace Linq.LinqQuery.W3Resources
 {
     public class W3ResourcesLinq
     {
