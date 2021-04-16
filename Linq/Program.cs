@@ -12,8 +12,8 @@ namespace Linq
         static void Main(string[] args)
         {
             var dbcontext = new W3ResourceContext();
-            var hr = new HRSubQuery(dbcontext);
-            hr.EighteenthExe();
+            var hr = new HRJoins(dbcontext);
+            hr.Exe12th();
         }
     }
 }
