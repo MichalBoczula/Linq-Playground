@@ -1,4 +1,5 @@
-﻿using Linq.LinqQuery.Inventory;
+﻿using Linq.LinqQuery.HR;
+using Linq.LinqQuery.Inventory;
 using Linq.Models;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,8 @@ namespace Linq
         static void Main(string[] args)
         {
             var dbcontext = new W3ResourceContext();
-            var inventoryLinqJoins = new InventoryLinqSubQueries(dbcontext);
-            inventoryLinqJoins.TwentySeventhExe();
+            var hr = new HRSubQuery(dbcontext);
+            hr.EighteenthExe();
         }
     }
 }

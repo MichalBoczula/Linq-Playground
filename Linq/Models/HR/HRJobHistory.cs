@@ -5,9 +5,9 @@ using System.Collections.Generic;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace Linq.Models
+namespace Linq.Models.HR
 {
-    public partial class JobHistory
+    public partial class HRJobHistory
     {
         public decimal EmployeeId { get; set; }
         public DateTime StartDate { get; set; }
@@ -15,8 +15,8 @@ namespace Linq.Models
         public string JobId { get; set; }
         public decimal? DepartmentId { get; set; }
 
-        public virtual Departments Department { get; set; }
-        public virtual Employees1 Employee { get; set; }
-        public virtual Jobs Job { get; set; }
+        public virtual HRDepartments Department { get; set; }
+        public virtual HREmployees Employee { get; set; }
+        public virtual HRJobs Job { get; set; }
     }
 }

@@ -5,20 +5,20 @@ using System.Collections.Generic;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace Linq.Models
+namespace Linq.Models.HR
 {
-    public partial class Countries
+    public partial class HRCountries
     {
-        public Countries()
+        public HRCountries()
         {
-            Locations = new HashSet<Locations>();
+            Locations = new HashSet<HRLocations>();
         }
 
         public string CountryId { get; set; }
         public string CountryName { get; set; }
         public decimal? RegionId { get; set; }
 
-        public virtual Regions Region { get; set; }
-        public virtual ICollection<Locations> Locations { get; set; }
+        public virtual HRRegions Region { get; set; }
+        public virtual ICollection<HRLocations> Locations { get; set; }
     }
 }

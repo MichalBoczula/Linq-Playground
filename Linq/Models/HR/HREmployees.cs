@@ -5,13 +5,13 @@ using System.Collections.Generic;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
-namespace Linq.Models
+namespace Linq.Models.HR
 {
-    public partial class Employees1
+    public partial class HREmployees
     {
-        public Employees1()
+        public HREmployees()
         {
-            JobHistory = new HashSet<JobHistory>();
+            JobHistory = new HashSet<HRJobHistory>();
         }
 
         public decimal EmployeeId { get; set; }
@@ -26,8 +26,8 @@ namespace Linq.Models
         public decimal? ManagerId { get; set; }
         public decimal? DepartmentId { get; set; }
 
-        public virtual Departments Department { get; set; }
-        public virtual Jobs Job { get; set; }
-        public virtual ICollection<JobHistory> JobHistory { get; set; }
+        public virtual HRDepartments Department { get; set; }
+        public virtual HRJobs Job { get; set; }
+        public virtual ICollection<HRJobHistory> JobHistory { get; set; }
     }
 }

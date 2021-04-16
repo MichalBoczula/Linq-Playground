@@ -1,4 +1,5 @@
 ﻿using System;
+using Linq.Models.HR;
 using Linq.Models.Inventory;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -26,20 +27,20 @@ namespace Linq.Models
         public virtual DbSet<AsstRefereeMast> AsstRefereeMast { get; set; }
         public virtual DbSet<Block> Block { get; set; }
         public virtual DbSet<CoachMast> CoachMast { get; set; }
-        public virtual DbSet<Countries> Countries { get; set; }
+        public virtual DbSet<HRCountries> HRCountries { get; set; }
         public virtual DbSet<InventoryCustomer> InventoryCustomer { get; set; }
         public virtual DbSet<Department> Department { get; set; }
         public virtual DbSet<Department1> Department1 { get; set; }
-        public virtual DbSet<Departments> Departments { get; set; }
+        public virtual DbSet<HRDepartments> HRDepartments { get; set; }
         public virtual DbSet<Director> Director { get; set; }
         public virtual DbSet<Employees> Employees { get; set; }
-        public virtual DbSet<Employees1> Employees1 { get; set; }
+        public virtual DbSet<HREmployees> HREmployees { get; set; }
         public virtual DbSet<Genres> Genres { get; set; }
         public virtual DbSet<GoalDetails> GoalDetails { get; set; }
-        public virtual DbSet<JobGrades> JobGrades { get; set; }
-        public virtual DbSet<JobHistory> JobHistory { get; set; }
-        public virtual DbSet<Jobs> Jobs { get; set; }
-        public virtual DbSet<Locations> Locations { get; set; }
+        public virtual DbSet<HRJobGrades> HRJobGrades { get; set; }
+        public virtual DbSet<HRJobHistory> HRJobHistory { get; set; }
+        public virtual DbSet<HRJobs> HRJobs { get; set; }
+        public virtual DbSet<HRLocations> HRLocations { get; set; }
         public virtual DbSet<MatchCaptain> MatchCaptain { get; set; }
         public virtual DbSet<MatchDetails> MatchDetails { get; set; }
         public virtual DbSet<MatchMast> MatchMast { get; set; }
@@ -63,7 +64,7 @@ namespace Linq.Models
         public virtual DbSet<Procedures> Procedures { get; set; }
         public virtual DbSet<Rating> Rating { get; set; }
         public virtual DbSet<RefereeMast> RefereeMast { get; set; }
-        public virtual DbSet<Regions> Regions { get; set; }
+        public virtual DbSet<HRRegions> HRRegions { get; set; }
         public virtual DbSet<Reviewer> Reviewer { get; set; }
         public virtual DbSet<Room> Room { get; set; }
         public virtual DbSet<SalaryGrade> SalaryGrade { get; set; }
@@ -223,7 +224,7 @@ namespace Linq.Models
                     .HasMaxLength(40);
             });
 
-            modelBuilder.Entity<Countries>(entity =>
+            modelBuilder.Entity<HRCountries>(entity =>
             {
                 entity.HasKey(e => e.CountryId);
 
@@ -316,7 +317,7 @@ namespace Linq.Models
                     .HasConstraintName("FK_Department_Physician");
             });
 
-            modelBuilder.Entity<Departments>(entity =>
+            modelBuilder.Entity<HRDepartments>(entity =>
             {
                 entity.HasKey(e => e.DepartmentId);
 
@@ -403,7 +404,7 @@ namespace Linq.Models
                     .HasConstraintName("FK_employees_department");
             });
 
-            modelBuilder.Entity<Employees1>(entity =>
+            modelBuilder.Entity<HREmployees>(entity =>
             {
                 entity.HasKey(e => e.EmployeeId)
                     .HasName("PK_Employees_1");
@@ -526,7 +527,7 @@ namespace Linq.Models
                     .HasConstraintName("FK_goal_details_soccer_team");
             });
 
-            modelBuilder.Entity<JobGrades>(entity =>
+            modelBuilder.Entity<HRJobGrades>(entity =>
             {
                 entity.HasKey(e => e.GradeLevel);
 
@@ -545,7 +546,7 @@ namespace Linq.Models
                     .HasColumnType("numeric(5, 0)");
             });
 
-            modelBuilder.Entity<JobHistory>(entity =>
+            modelBuilder.Entity<HRJobHistory>(entity =>
             {
                 entity.HasKey(e => new { e.EmployeeId, e.StartDate });
 
@@ -588,7 +589,7 @@ namespace Linq.Models
                     .HasConstraintName("FK_Job_History_Jobs");
             });
 
-            modelBuilder.Entity<Jobs>(entity =>
+            modelBuilder.Entity<HRJobs>(entity =>
             {
                 entity.HasKey(e => e.JobId);
 
@@ -612,7 +613,7 @@ namespace Linq.Models
                     .HasColumnType("numeric(6, 0)");
             });
 
-            modelBuilder.Entity<Locations>(entity =>
+            modelBuilder.Entity<HRLocations>(entity =>
             {
                 entity.HasKey(e => e.LocationId);
 
@@ -1274,7 +1275,7 @@ namespace Linq.Models
                     .HasConstraintName("FK_referee_mast_soccer_country");
             });
 
-            modelBuilder.Entity<Regions>(entity =>
+            modelBuilder.Entity<HRRegions>(entity =>
             {
                 entity.HasKey(e => e.RegionId);
 
