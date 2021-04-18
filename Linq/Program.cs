@@ -13,7 +13,7 @@ namespace Linq
         {
             var dbcontext = new W3ResourceContext();
             var hr = new HRJoins(dbcontext);
-            hr.Exe12th();
+            hr.Exe27th();
         }
     }
 }

@@ -200,8 +200,8 @@ namespace Linq.LinqQuery.HR
         public void Exe12th()
         {
             var taylor = (from e in _w3ResourceContext.HREmployees
-                         where e.LastName == "Taylor"
-                         select e.DepartmentId)
+                          where e.LastName == "Taylor"
+                          select e.DepartmentId)
                          .ToList();
 
             var result = from e in _w3ResourceContext.HREmployees
@@ -224,11 +224,201 @@ namespace Linq.LinqQuery.HR
         }
 
         /// <summary>
-        /// 
+        /// --13. Write a query in SQL to display the 
+        ///--job title, department name, full name(first and last name) of employee, and starting date for all the jobs which started on 
+        ///--or after 1st January, 1993 and ending with on or before 2006-08-31 
         /// </summary>
-        public void Exe()
+        public void Exe13th()
         {
+            var startDate = new DateTime(1993, 1, 1);
+            var endDate = new DateTime(2006, 8, 31);
 
+            var result = from e in _w3ResourceContext.HREmployees
+                         join h in _w3ResourceContext.HRJobHistory
+                              on e.EmployeeId equals h.EmployeeId
+                         where h.StartDate >= startDate &&
+                              h.EndDate <= endDate
+                         select new
+                         {
+                             FullName = $"{e.FirstName} {e.LastName}",
+                             h.StartDate,
+                             e.JobId
+                         };
+
+            System.Console.WriteLine($"Count: {result.Count()}");
+            foreach (var ele in result)
+            {
+                System.Console.WriteLine($"{ ele.FullName}, {ele.StartDate}, {ele.JobId}");
+            }
+        }
+
+        /// <summary>
+        /// 14. Write a query in SQL to display job title, full name (first and last name) of employee, and the difference 
+        ///--between maximum salary for the job and salary of the employee.
+        /// </summary>
+        public void Exe14th()
+        {
+            var result = from e in _w3ResourceContext.HREmployees
+                         from g in _w3ResourceContext.HRJobGrades
+                         where e.Salary >= g.LowestSal && e.Salary <= g.HighestSal
+                         select new
+                         {
+                             FullName = $"{e.FirstName} {e.LastName}",
+                             e.JobId,
+                             Difference = g.HighestSal - e.Salary
+                         };
+
+            System.Console.WriteLine($"Count: {result.Count()}");
+            foreach (var ele in result)
+            {
+                System.Console.WriteLine($"{ ele.FullName}, {ele.JobId}, {ele.Difference}");
+            }
+        }
+
+        /// <summary>
+        /// 15. Write a query in SQL to display the name of the department, average salary and number of employees 
+        ///--working in that department who got commission.
+        /// </summary>
+        public void Exe15th()
+        {
+            var aggregate = from e in _w3ResourceContext.HREmployees
+                            group e by e.DepartmentId into que
+                            select new
+                            {
+                                que.Key,
+                                Count = que.Count(),
+                                AvgSalary = que.Average(x => x.Salary)
+                            };
+
+            var result = from d in _w3ResourceContext.HRDepartments
+                         join x in aggregate
+                            on d.DepartmentId equals x.Key
+                         select new
+                         {
+                             d.DepartmentName,
+                             x.Count,
+                             x.AvgSalary
+                         };
+
+            System.Console.WriteLine($"Count: {result.Count()}");
+            foreach (var ele in result)
+            {
+                System.Console.WriteLine($"{ ele.DepartmentName}, {ele.Count}, {ele.AvgSalary}");
+            }
+        }
+
+        /// <summary>
+        /// 21. Write a query in SQL to display the country name, city, and number of those departments where at leaste 2 employees are working.
+        /// </summary>
+        public void Exe21th()
+        {
+            var agg = (from e in _w3ResourceContext.HREmployees
+                       group e by e.DepartmentId into que
+                       select new
+                       {
+                           que.Key,
+                           Count = que.Count()
+                       }).Where(x => x.Count >= 2);
+
+            var result = from d in _w3ResourceContext.HRDepartments
+                         join x in agg
+                            on d.DepartmentId equals x.Key
+                         join l in _w3ResourceContext.HRLocations
+                             on d.LocationId equals l.LocationId
+                         join c in _w3ResourceContext.HRCountries
+                            on l.CountryId equals c.CountryId
+                         select new
+                         {
+                             d.DepartmentName,
+                             l.City,
+                             c.CountryName
+                         };
+
+            System.Console.WriteLine($"Count: {result.Count()}");
+            foreach (var ele in result)
+            {
+                System.Console.WriteLine($"{ ele.DepartmentName}, {ele.City}, {ele.CountryName}");
+            }
+        }
+
+        /// <summary>
+        /// 22. Write a query in SQL to display the department name, full name (first and last name) of manager, and their city.
+        /// </summary>
+        public void Exe22th()
+        {
+            var managers = from e in _w3ResourceContext.HREmployees
+                           select e.ManagerId;
+
+            var result = from e in _w3ResourceContext.HREmployees
+                         where managers.ToList().Contains(e.EmployeeId)
+                         join d in _w3ResourceContext.HRDepartments
+                            on e.DepartmentId equals d.DepartmentId
+                         join l in _w3ResourceContext.HRLocations
+                            on d.LocationId equals l.LocationId
+                         select new
+                         {
+                             FullName = $"{e.FirstName} {e.LastName}",
+                             d.DepartmentName,
+                             l.City
+                         };
+
+            System.Console.WriteLine($"Count: {result.Count()}");
+            foreach (var ele in result)
+            {
+                System.Console.WriteLine($"{ ele.FullName}, {ele.DepartmentName}, {ele.City}");
+            }
+        }
+
+        /// <summary>
+        /// 24. Write a query in SQL to display the full name (first and last name), and salary
+        ///--of those employees who working in any department located in Seatlle.
+        /// </summary>
+        public void Exe24th()
+        {
+            var result = from e in _w3ResourceContext.HREmployees
+                         join d in _w3ResourceContext.HRDepartments
+                            on e.DepartmentId equals d.DepartmentId
+                         join l in _w3ResourceContext.HRLocations
+                             on d.LocationId equals l.LocationId
+                         where l.City == "Seattle"
+                         select new
+                         {
+                             FullName = $"{e.FirstName} {e.LastName}",
+                             e.Salary
+                         };
+
+            System.Console.WriteLine($"Count: {result.Count()}");
+            foreach (var ele in result)
+            {
+                System.Console.WriteLine($"{ ele.FullName}, {ele.Salary}");
+            }
+        }
+
+        /// <summary>
+        /// 27. Write a query in SQL to display the full name (first and last name ) 
+        ///--of employee with ID and name of the country presently where(s)he is working.
+        /// </summary>
+        public void Exe27th()
+        {
+            var result = from e in _w3ResourceContext.HREmployees
+                         join d in _w3ResourceContext.HRDepartments
+                            on e.DepartmentId equals d.DepartmentId
+                         join l in _w3ResourceContext.HRLocations
+                             on d.LocationId equals l.LocationId
+                         join c in _w3ResourceContext.HRCountries
+                             on l.CountryId equals c.CountryId
+                         select new
+                         {
+                             FullName = $"{e.FirstName} {e.LastName}",
+                             c.CountryId,
+                             c.CountryName
+                         };
+
+            System.Console.WriteLine($"Count: {result.Count()}");
+            foreach (var ele in result)
+            {
+                System.Console.WriteLine($"{ ele.FullName}, {ele.CountryId}, {ele.CountryName}");
+            }
         }
     }
 }
