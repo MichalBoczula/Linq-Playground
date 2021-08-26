@@ -16,7 +16,7 @@ namespace Linq.LinqQuery.Movies
         }
 
         /// <summary>
-        /// 1. Write a query in SQL to find the name of all reviewers who have rated their ratings with a NULL value. 
+        /// Write a query in SQL to find the name of all reviewers who have rated their ratings with a NULL value. 
         /// </summary>
         public void Exe1st()
         {
@@ -48,8 +48,8 @@ namespace Linq.LinqQuery.Movies
 
         /// <summary>
         /// Write a query in SQL to list the first and last names of all the actors 
-        /// who were cast in the movie 'Annie Hall'
-        ///, and the roles they played in that production.
+        /// who were cast in the movie 'Annie Hall',
+        /// and the roles they played in that production.
         /// </summary>
         public void Exe2nd()
         {
@@ -99,7 +99,7 @@ namespace Linq.LinqQuery.Movies
         }
 
         /// <summary>
-        /// 3. Write a query in SQL to find the name of movie and director(first and last names)
+        /// Write a query in SQL to find the name of movie and director(first and last names)
         /// who directed a movie that casted a role for 'Eyes Wide Shut'.
         /// </summary>
         public void Exe3rd()
@@ -143,7 +143,7 @@ namespace Linq.LinqQuery.Movies
         }
 
         /// <summary>
-        /// --4. Write a query in SQL to find the name of movie and director (first and last names)
+        /// Write a query in SQL to find the name of movie and director (first and last names)
         /// who directed a movie that casted a role as Sean Maguire
         /// </summary>
         public void Exe4th()
@@ -204,62 +204,173 @@ namespace Linq.LinqQuery.Movies
         }
 
         /// <summary>
-        /// 5. Write a query in SQL to list all the actors who have not acted in any movie between 1990 and 2000.
+        /// Write a query in SQL to list all the actors who have not acted in any movie between 1990 and 2000.
         /// </summary>
         public void Exe5th()
         {
             var result = from m in _context.Movie
-                         join md in _context.MovieDirection on m.MovId equals md.MovId
                          join mc in _context.MovieCast on m.MovId equals mc.MovId
-                         join d in _context.Director on md.DirId equals d.DirId
-                         where mc.Role == "Sean Maguire"
+                         join a in _context.Actor on mc.ActId equals a.ActId
+                         where !(m.MovYear >= 1990 && m.MovYear <= 2000)
                          select new
                          {
-                             Name = $"{d.DirFname} {d.DirLname}",
-                             Title = $"{m.MovTitle}"
+                             Name = $"{a.ActFname} {a.ActLname}"
                          };
             foreach (var r in result)
             {
-                System.Console.WriteLine($"{r.Name} {r.Title}");
+                System.Console.WriteLine($"{r.Name}");
             }
 
             var result2 = _context.Movie
-                .Join(_context.MovieDirection,
-                    m => m.MovId,
-                    md => md.MovId,
-                    (m, md) => new
-                    {
-                        m.MovTitle,
-                        md.DirId,
-                        m.MovId
-                    })
                 .Join(_context.MovieCast,
-                    any => any.MovId,
+                    m => m.MovId,
                     mc => mc.MovId,
-                    (any, mc) => new
+                    (m, mc) => new
                     {
-                        any.MovTitle,
-                        any.DirId,
-                        mc.Role
+                        mc.ActId,
+                        m.MovYear
+                    })
+                .Join(_context.Actor,
+                    any => any.ActId,
+                    a => a.ActId,
+                    (any, a) => new
+                    {
+                        Name = $"{a.ActFname} {a.ActLname}",
+                        Year = any.MovYear
+                    })
+                .Where(any => !(any.Year >= 1990 && any.Year < 2000))
+                .Select(any => any.Name);
+            foreach (var r in result2)
+            {
+                System.Console.WriteLine($"{r}");
+            }
+        }
+
+        /// <summary>
+        /// Write a query in SQL to list first and last name of all the directors with 
+        /// number of genres movies the directed with genres name, 
+        /// and arranged the result alphabetically with the first and last name of the director.
+        /// </summary>
+        public void Exe6th()
+        {
+            var result = from g in _context.Genres
+                         join mg in _context.MovieGenres on g.GenId equals mg.GenId
+                         join md in _context.MovieDirection on mg.MovId equals md.MovId
+                         join d in _context.Director on md.DirId equals d.DirId
+                         group g by new { g.GenTitle, d.DirLname, d.DirFname } into x
+                         orderby x.Key.DirLname, x.Key.DirFname, x.Key.GenTitle
+                         select new
+                         {
+                             Name = $"{x.Key.DirFname} {x.Key.DirLname}",
+                             Title = x.Key.GenTitle,
+                             Quantity = x.Count()
+                         };
+         
+            foreach (var r in result)
+            {
+                System.Console.WriteLine($"{r.Name} {r.Title} {r.Quantity}");
+            }
+
+            var result2 = _context.Genres
+                .Join(_context.MovieGenres,
+                    g => g.GenId,
+                    mg => mg.GenId,
+                    (g, mg) => new
+                    {
+                        mg.MovId,
+                        g.GenTitle
+                    })
+                .Join(_context.MovieDirection,
+                    any => any.MovId,
+                    md => md.MovId,
+                    (any, md) => new
+                    {
+                        any.GenTitle,
+                        md.DirId
                     })
                 .Join(_context.Director,
                     any => any.DirId,
                     d => d.DirId,
                     (any, d) => new
                     {
-                        Title = any.MovTitle,
-                        Name = $"{d.DirFname} {d.DirLname}",
-                        Role = any.Role
+                        d.DirFname, 
+                        d.DirLname,
+                        any.GenTitle
                     })
-                .Where(any => any.Role == "Sean Maguire")
-                .Select(any => new
+                .GroupBy(x => new { x.GenTitle , x.DirFname, x.DirLname})
+                .OrderBy(x => x.Key.DirLname)
+                .ThenBy(x => x.Key.DirFname)
+                .ThenBy(x => x.Key.GenTitle)
+                .Select(group => new
                 {
-                    any.Name,
-                    any.Title
+                    Name = $"{group.Key.DirFname} {group.Key.DirLname}",
+                    Title = group.Key.GenTitle,
+                    Quantity = group.Count()
                 });
+
+            System.Console.WriteLine($"");
             foreach (var r in result2)
             {
-                System.Console.WriteLine($"{r.Name} {r.Title}");
+                System.Console.WriteLine($"{r.Name} {r.Title} {r.Quantity}");
+            }
+        }
+
+        /// <summary>
+        /// Write a query in SQL to compute a report which contain the genres of those movies 
+        /// with their average time and number of movies for each genres.
+        /// </summary>
+        public void Exe7th()
+        {
+            var result = from g in _context.Genres
+                         join mg in _context.MovieGenres on g.GenId equals mg.GenId
+                         join m in _context.Movie on mg.MovId equals m.MovId
+                         group new { g, m } by g.GenTitle into x
+                         select new
+                         {
+                             x.Key,
+                             Quantity = x.Count(),
+                             AvgTime = x.Average(x => x.m.MovTime)
+                         };
+                          
+            foreach (var r in result)
+            {
+                System.Console.WriteLine($"{r.Key} {r.AvgTime} {r.Quantity}");
+            }
+
+            var result2 = _context.Genres
+                .Join(_context.MovieGenres,
+                    g => g.GenId,
+                    mg => mg.GenId,
+                    (g, mg) => new
+                    {
+                        g.GenTitle,
+                        mg.MovId
+                    })
+                .Join(_context.Movie,
+                    any => any.MovId,
+                    m => m.MovId,
+                    (any, m) => new
+                    {
+                        m.MovTime,
+                        any.GenTitle
+                    })
+                .GroupBy(any => any.GenTitle,
+                    any => new
+                    {
+                        any.GenTitle,
+                        any.MovTime
+                    })
+                .Select(any => new
+                {
+                    any.Key,
+                    Quantity = any.Count(),
+                    AvgTime = any.Average(x => x.MovTime)
+                });
+
+            System.Console.WriteLine($"");
+            foreach (var r in result2)
+            {
+                System.Console.WriteLine($"{r.Key} {r.AvgTime} {r.Quantity}");
             }
         }
     }

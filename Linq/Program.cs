@@ -14,7 +14,7 @@ namespace Linq
         {
             var dbcontext = new W3ResourceContext();
             var movie = new MoviesLinqJoins(dbcontext);
-            movie.Exe4th();
+            movie.Exe7th();
         }
     }
 }
