@@ -8,13 +8,13 @@ using System.Linq;
 
 namespace Linq
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
             var dbcontext = new W3ResourceContext();
             var movie = new MoviesLinqJoins(dbcontext);
-            movie.Exe7th();
+            movie.Exe10th();
         }
     }
 }
