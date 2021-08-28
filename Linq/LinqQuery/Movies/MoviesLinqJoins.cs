@@ -565,5 +565,358 @@ namespace Linq.LinqQuery.Movies
             }
         }
 
+        /// <summary>
+        /// Write a query in SQL to find the movie title, year, date of release, 
+        /// director and actor for those movies which reviewer is unknown. SELECT A.mov_title, A.mov_year, A.mov_dt_rel,
+        /// </summary>
+        public void Exe11th()
+        {
+            var result = from rev in _context.Reviewer
+                         join ra in _context.Rating
+                            on rev.RevId equals ra.RevId
+                         join mov in _context.Movie
+                             on ra.MovId equals mov.MovId
+                         where rev.RevName == null
+                         select new
+                         {
+                             mov.MovTitle,
+                             mov.MovYear,
+                             mov.MovDtRel,
+                         };
+
+            foreach (var r in result)
+            {
+                System.Console.WriteLine($"{r.MovTitle} {r.MovDtRel} {r.MovYear}");
+            }
+
+            var result2 = _context.Reviewer
+                .Join(_context.Rating,
+                    rev => rev.RevId,
+                    ra => ra.RevId,
+                    (rev, ra) => new
+                    {
+                        ra.MovId,
+                        rev.RevName
+                    })
+                .Join(_context.Movie,
+                    any => any.MovId,
+                    mov => mov.MovId,
+                    (any, mov) => new
+                    {
+                        any.RevName,
+                        mov.MovTitle,
+                        mov.MovYear,
+                        mov.MovDtRel
+                    })
+                .Where(any => any.RevName == null)
+                .Select(any => new
+                {
+                    any.MovTitle,
+                    any.MovYear,
+                    any.MovDtRel
+                });
+
+            foreach (var r in result2)
+            {
+                System.Console.WriteLine($"{r.MovTitle} {r.MovDtRel} {r.MovYear}");
+            }
+        }
+
+        /// <summary>
+        /// Write a query in SQL to find all the years which produced at least one movie and
+        /// that received a rating of more than 8 stars.Show the results in increasing order.
+        /// </summary>
+        public void Exe12th()
+        {
+            var query = from ra in _context.Movie
+                        group ra by ra.MovYear into x
+                        select new
+                        {
+                            x.Key,
+                            Quantity = x.Count()
+                        };
+
+            var result = from mov in _context.Movie
+                         join ra in _context.Rating
+                            on mov.MovId equals ra.MovId
+                         join q in query
+                             on mov.MovYear equals q.Key
+                         where ra.RevStars > 8
+                            && q.Quantity > 1
+                         select new
+                         {
+                             mov.MovTitle,
+                             mov.MovYear
+                         };
+
+            foreach (var r in result)
+            {
+                System.Console.WriteLine($"{r.MovTitle} {r.MovYear}");
+            }
+
+            var query2 = _context.Movie
+                .GroupBy(x => x.MovYear)
+                .Select(x => new
+                {
+                    x.Key,
+                    Quantity = x.Count()
+                });
+
+            var result2 = _context.Movie
+                .Join(_context.Rating,
+                    mov => mov.MovId,
+                    ra => ra.MovId,
+                    (mov, ra) => new
+                    {
+                        mov.MovTitle,
+                        mov.MovYear,
+                        ra.RevStars
+                    })
+                .Join(query2,
+                    any => any.MovYear,
+                    q => q.Key,
+                    (any, q) => new
+                    {
+                        any.MovTitle,
+                        any.MovYear,
+                        any.RevStars,
+                        q.Quantity
+                    })
+                .Where(any => any.RevStars > 8
+                    && any.Quantity > 1)
+                .Select(any => new
+                {
+                    any.MovTitle,
+                    any.MovYear
+                });
+
+            foreach (var r in result2)
+            {
+                System.Console.WriteLine($"{r.MovTitle} {r.MovYear}");
+            }
+        }
+
+        /// <summary>
+        /// Write a query in SQL to find the reviewer's name and the title of the movie
+        /// for those reviewers who rated more than one movies.
+        /// </summary>
+        public void Exe13th()
+        {
+            var query = from ra in _context.Rating
+                        group ra by ra.RevId into x
+                        select new
+                        {
+                            x.Key,
+                            Quantity = x.Count()
+                        };
+
+            var result = from mov in _context.Movie
+                         join ra in _context.Rating
+                            on mov.MovId equals ra.MovId
+                         join rev in _context.Reviewer
+                            on ra.RevId equals rev.RevId
+                         join q in query
+                             on rev.RevId equals q.Key
+                         where q.Quantity > 1 &&
+                             rev.RevName != null
+                         select new
+                         {
+                             rev.RevName,
+                             mov.MovTitle
+                         };
+
+            foreach (var r in result)
+            {
+                System.Console.WriteLine($"{r.MovTitle} {r.RevName}");
+            }
+
+            var query2 = _context.Rating
+                .GroupBy(x => x.RevId)
+                .Select(x => new
+                {
+                    x.Key,
+                    Quantity = x.Count()
+                });
+
+            var result2 = _context.Movie
+                .Join(_context.Rating,
+                    mov => mov.MovId,
+                    ra => ra.MovId,
+                    (mov, ra) => new
+                    {
+                        ra.RevId,
+                        mov.MovTitle,
+                    })
+                .Join(_context.Reviewer,
+                    any => any.RevId,
+                    rev => rev.RevId,
+                    (any, rev) => new
+                    {
+                        any.MovTitle,
+                        rev.RevName,
+                        rev.RevId
+                    })
+                .Join(query2,
+                    any => any.RevId,
+                    q => q.Key,
+                    (any, q) => new
+                    {
+                        any.MovTitle,
+                        any.RevName,
+                        q.Quantity
+                    })
+                .Where(any => any.Quantity > 1
+                    && any.RevName != null)
+                .Select(any => new
+                {
+                    any.MovTitle,
+                    any.RevName
+                });
+
+            foreach (var r in result2)
+            {
+                System.Console.WriteLine($"{r.MovTitle} {r.RevName}");
+            }
+        }
+
+        /// <summary>
+        /// Write a query in SQL to find the movie title, and the highest number of stars that movie received and arranged 
+        /// the result according to the group of a movie and the movie title appear alphabetically in ascending order.
+        /// </summary>
+        public void Exe14th()
+        {
+            var query = from ra in _context.Rating
+                        group ra by ra.MovId into x
+                        select new
+                        {
+                            x.Key,
+                            Max = x.Max(x => x.RevStars)
+                        };
+
+            var result = from mov in _context.Movie
+                         join q in query
+                             on mov.MovId equals q.Key
+                         orderby mov.MovTitle ascending
+                         select new
+                         {
+                             mov.MovTitle,
+                             q.Max
+                         };
+
+            foreach (var r in result)
+            {
+                System.Console.WriteLine($"{r.MovTitle} {r.Max}");
+            }
+
+            var query2 = _context.Rating
+                .GroupBy(x => x.MovId)
+                .Select(x => new
+                {
+                    x.Key,
+                    Max = x.Max(x => x.RevStars)
+                });
+
+            var result2 = _context.Movie
+                .Join(query2,
+                    mov => mov.MovId,
+                    q => q.Key,
+                    (mov, q) => new
+                    {
+                        mov.MovTitle,
+                        q.Max
+                    })
+                .OrderBy(any => any.MovTitle)
+                .Select(any => new
+                {
+                    any.MovTitle,
+                    any.Max
+                });
+
+            foreach (var r in result2)
+            {
+                System.Console.WriteLine($"{r.MovTitle} {r.Max}");
+            }
+        }
+
+
+        /// <summary>
+        /// Write a query in SQL to find the name of those movies where one or more actors acted in two or more movies.
+        /// </summary>
+        public void Exe15th()
+        {
+            var query = from ra in _context.MovieCast
+                        group ra by ra.ActId into x
+                        select new
+                        {
+                            x.Key,
+                            Quantity = x.Count()
+                        };
+
+            var result = from mov in _context.Movie
+                         join mc in _context.MovieCast
+                            on mov.MovId equals mc.MovId
+                         join a in _context.Actor
+                            on mc.ActId equals a.ActId
+                         join q in query
+                             on a.ActId equals q.Key
+                         where q.Quantity > 1
+                         select new
+                         {
+                             Name = $"{a.ActFname} { a.ActLname}",
+                             mov.MovTitle
+                         };
+
+            foreach (var r in result)
+            {
+                System.Console.WriteLine($"{r.Name} {r.MovTitle}");
+            }
+
+            var query2 = _context.MovieCast
+                .GroupBy(x => x.ActId)
+                .Select(x => new
+                {
+                    x.Key,
+                    Quantity = x.Count()
+                });
+
+            var result2 = _context.Movie
+                .Join(_context.MovieCast,
+                    mov => mov.MovId,
+                    mc => mc.MovId,
+                    (mov, mc) => new
+                    {
+                        mov.MovTitle,
+                        mc.ActId
+                    })
+                .Join(_context.Actor,
+                    any => any.ActId,
+                    a => a.ActId,
+                    (any, a) => new
+                    {
+                        any.ActId,
+                        any.MovTitle,
+                        Name = $"{a.ActFname} {a.ActLname}"
+                    })
+                .Join(query2,
+                    any => any.ActId,
+                    q => q.Key,
+                    (any, q) => new
+                    {
+                        any.MovTitle,
+                        any.Name,
+                        q.Quantity
+                    })
+                .Where(any => any.Quantity > 1)
+                .Select(any => new
+                {
+                    any.MovTitle,
+                    any.Name
+                });
+
+            foreach (var r in result2)
+            {
+                System.Console.WriteLine($"{r.MovTitle} {r.Name}");
+            }
+        }
     }
 }
